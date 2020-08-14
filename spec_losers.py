@@ -5,7 +5,8 @@
     they must manually rejoin a team.
 
     This plugin remembers what team they were on previously and
-    automatically puts them back with the right team.
+    automatically puts them back with the right team. You can also
+    turn on a flag to turn on the "spec loser" behavior.
 '''
 
 # All minqlx plug ins must import minqlx

@@ -155,9 +155,12 @@ class zebby_gamemodes(minqlx.Plugin):
             teamsize = self.get_cvar('teamsize')
             if teamsize == '0':
                self.set_cvar(cvar, value)
-         elif cvar == 'game_start' and phase == 'game':
-            for cvar2, value2 in zebby_factories[key]['game_start'].items():
-               self.set_cvar(cvar2, value2)
+         elif cvar == 'game_start':
+            if phase == "game":
+               for cvar2, value2 in zebby_factories[key]['game_start'].items():
+                  self.set_cvar(cvar2, value2)
+            else:
+               pass
          else:
             self.set_cvar(cvar, value)
 

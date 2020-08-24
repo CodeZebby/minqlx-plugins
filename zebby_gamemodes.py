@@ -186,13 +186,14 @@ class zebby_gamemodes(minqlx.Plugin):
       game_logic(lambda: minqlx.console_command('map_restart'))
 
    def handleNewGame(self):
+      game_factory = self.get_cvar('g_factory').lower()
       # self.msg('ZEBBY: game factory is {}'.format(str(game_factory)))
 
       # Only load cvars if the game type has changed.
-      if self.game.type_short != self.previous_factory:
+      if game_factory != self.previous_factory:
          # Keep track of current game type, so we can check
          # if it has changed later.
-         self.previous_factory = self.game.type_short
+         self.previous_factory = game_factory
 
          # Set cvars
          self.setGameSettings()
@@ -207,7 +208,7 @@ class zebby_gamemodes(minqlx.Plugin):
       return None
 
    def setGameSettings(self, phase = "warmup"):
-      game_factory = self.game.type_short
+      game_factory = self.get_cvar('g_factory').lower()
       self.msg('ZEBBY: game factory is {}'.format(str(game_factory)))
 
       # Load common cvar settings.

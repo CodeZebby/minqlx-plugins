@@ -13,7 +13,7 @@
 import minqlx
 import time
 
-SUPPORTED_GAMETYPES = ['ca', 'tdm', 'ctf', 'ffa', 'duel', 'oneflag', '1f', 'ft', 'rr', 'har', 'dom', 'ad']
+SUPPORTED_GAMETYPES = ['ca', 'tdm', 'ctf', 'ffa', 'duel', 'oneflag', '1f', 'ft', 'rr', 'har', 'dom', 'ad', 'vlg']
 ffa_based_factories = ['ffa', 'iffa', 'duel', 'race']
 DEFAULT_TEAMSIZE = 4
 

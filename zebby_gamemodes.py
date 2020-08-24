@@ -8,7 +8,7 @@ import time
 zebby_factories = {
    'ca': {
       'g_friendlyFire': '0',
-      'g_ammopack': '1',
+      'g_ammopack': '0',
       'g_regenHealth': '0',
       'roundtimelimit': '90',
       'g_startingWeapons': '8447',
@@ -24,13 +24,14 @@ zebby_factories = {
       'fraglimit': '0',
       'g_loadout': '0',
       'g_startingWeapons': '3',
-      # 'g_ammoPack': '0',
+      'g_ammoPack': '0',
       'g_ammoRespawn': '40',
       'g_startingHealth': '100',
       'g_startingHealthBonus': '25',
       'g_regenHealth': '0',
       'g_startingArmor': '0',
       'g_voteDelay': '1000',
+      'g_infiniteAmmo': '0',
       # 'g_runes': '0',
    },
    'ctf': {
@@ -112,7 +113,7 @@ zebby_factories = {
       'g_startingAmmo_pg': '100',
       'g_startingAmmo_hmg': '150',
       'g_loadout': '0',
-      'g_ammoPack': '1',
+      'g_ammoPack': '0',
       'g_ammoRespawn': '5',
       'g_friendlyFire': '0',
       'g_startingHealth': '100',

@@ -124,6 +124,7 @@ zebby_factories = {
       'g_spawnItemPowerup': '0',
       'g_spawnDelay_powerup': '99999999999',
       'g_spawnDelayRandom_powerup': '99999999999',
+      "g_vampiricDamage": "0",
       # 'g_runes': '1',
       'g_infiniteAmmo': '1',
       'game_start': {
@@ -207,6 +208,7 @@ class zebby_gamemodes(minqlx.Plugin):
 
    def setGameSettings(self, phase = "warmup"):
       game_factory = self.game.type_short
+      self.msg('ZEBBY: game factory is {}'.format(str(game_factory)))
 
       # Load common cvar settings.
       if game_factory in shared_factories:

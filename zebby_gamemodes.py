@@ -1,6 +1,10 @@
 import minqlx
 import time
 
+# Each cvar takes effect when warmup starts.
+# cvars in the 'game_start' object take effect
+# when the game starts.
+
 zebby_factories = {
    'ca': {
       'g_friendlyFire': '0',
@@ -42,8 +46,6 @@ zebby_factories = {
 
    },
    'ift': {
-      # 'g_freezeAutoThawTime': '45000',
-      # 'g_freezeEnvironmentalRespawnDelay': '5000',
       'g_freezeThawTime': '2000',
       'g_freezeRoundDelay': '4000',
       'g_freezeThawThroughSurface': '1',
@@ -52,9 +54,6 @@ zebby_factories = {
       'roundtimelimit': '90'
    },
    'ft': {
-      # 'g_freezeAutoThawTime': '120000',
-      # 'g_freezeEnvironmentalRespawnDelay': '120000',
-      # 'g_freezeThawTime': '120000', # This controls respawn time during warmup too...
       'g_freezeRoundDelay': '10000',
       'g_startingAmmo_mg': '100',
       'g_startingAmmo_sg': '50',
@@ -68,7 +67,15 @@ zebby_factories = {
       # 'g_freezeThawThroughSurface': '0',
       'timelimit': '0',
       'dmflags': '28',
-      'roundtimelimit': '80'
+      'roundtimelimit': '80',
+      'g_freezeThawTime': '2000',
+      'g_freezeAutoThawTime': '120000',
+      'g_freezeEnvironmentalRespawnDelay': '5000',
+      'game_start': {
+         'g_freezeThawTime': '120000',
+         'g_freezeAutoThawTime': '120000',
+         'g_freezeEnvironmentalRespawnDelay': '120000',
+      }
    },
    'ffa_based': {
       'teamsize': '0',
@@ -80,6 +87,14 @@ zebby_factories = {
    },
    'tdm': {
       'fraglimit': '30'
+   },
+   'vlg': {
+      'g_startingWeapons': "32",
+      "roundtimelimit": "80",
+      "g_vampiricDamage": "1",
+      'game_start': {
+         'g_infiniteAmmo': '1'
+      }
    },
    'shared': {
       'dmflags': '28', #28 for no dmg
@@ -110,11 +125,15 @@ zebby_factories = {
       'g_spawnDelay_powerup': '99999999999',
       'g_spawnDelayRandom_powerup': '99999999999',
       # 'g_runes': '1',
+      'g_infiniteAmmo': '1',
+      'game_start': {
+         'g_infiniteAmmo': '0'
+      }
    }
 }
 
 ffa_based_factories = ['ffa', 'iffa', 'duel', 'race']
-shared_factories = ['ctf', 'tdm', 'ffa', 'ft', 'oneflag', 'har']
+shared_factories = ['ctf', 'tdm', 'ffa', 'ft', 'oneflag', 'har', 'vlg']
 
 class zebby_gamemodes(minqlx.Plugin):
    def __init__(self):
@@ -123,10 +142,10 @@ class zebby_gamemodes(minqlx.Plugin):
       self.voted_team_based_teamsize = None
       self.voted_ffa_teamsize = None
       self.add_hook('new_game', self.handleNewGame)
+      self.add_hook('game_countdown', self.handleGameCountdown)
       self.previous_factory = None
 
-   def setCvars(self, key):
-
+   def setCvars(self, key, phase = "warmup"):
       for cvar, value in zebby_factories[key].items():
          if cvar == 'teamsize' and key == 'team_based':
             ''' We need to do this to keep sensible team sizes:
@@ -136,6 +155,9 @@ class zebby_gamemodes(minqlx.Plugin):
             teamsize = self.get_cvar('teamsize')
             if teamsize == '0':
                self.set_cvar(cvar, value)
+         elif cvar == 'game_start' and phase == 'game':
+            for cvar2, value2 in zebby_factories[key]['game_start'].items():
+               self.set_cvar(cvar2, value2)
          else:
             self.set_cvar(cvar, value)
 
@@ -156,30 +178,57 @@ class zebby_gamemodes(minqlx.Plugin):
       game_logic(lambda: minqlx.console_command('map_restart'))
 
    def handleNewGame(self):
-      game_factory = self.get_cvar('g_factory').lower()
       # self.msg('ZEBBY: game factory is {}'.format(str(game_factory)))
 
+      # Only load cvars if the game type has changed.
       if self.game.type_short != self.previous_factory:
+         # Keep track of current game type, so we can check
+         # if it has changed later.
          self.previous_factory = self.game.type_short
 
-         if game_factory in shared_factories:
-            for cvar, value in zebby_factories['shared'].items():
-               self.set_cvar(cvar, value)
-
-         if game_factory == 'ictf' or game_factory == 'iffa' or game_factory == 'ift':
-            for cvar, value in zebby_factories['insta'].items():
-               self.set_cvar(cvar, value)
-         else:
-            self.setCvars('not_insta')
-
-         if game_factory in ffa_based_factories:
-            self.setCvars('ffa_based')
-         else:
-            self.setCvars('team_based')
-
-         if game_factory in zebby_factories:
-            for cvar, value in zebby_factories[game_factory].items():
-               self.set_cvar(cvar, value)
+         # Set cvars
+         self.setGameSettings()
 
          # self.mapRestart()
+      else:
+         # If the game type did not change,
+         # maybe this method was called because
+         # the game started.
+         self.handleGamePossiblyStarted()
+
       return None
+
+   def setGameSettings(self, phase = "warmup"):
+      game_factory = self.game.type_short
+
+      # Load common cvar settings.
+      if game_factory in shared_factories:
+         self.setCvars('shared', phase)
+
+      # Load insta related cvars (or unload them)
+      if game_factory == 'ictf' or game_factory == 'iffa' or game_factory == 'ift':
+         self.setCvars('insta', phase)
+      else:
+         self.setCvars('not_insta', phase)
+
+      # Load ffa or team based cvars.
+      if game_factory in ffa_based_factories:
+         self.setCvars('ffa_based', phase)
+      else:
+         self.setCvars('team_based', phase)
+
+      # Lastly, load any cvars specific to the game type.
+      if game_factory in zebby_factories:
+         self.setCvars(game_factory, phase)
+
+   @minqlx.thread
+   def handleGamePossiblyStarted(self):
+      time.sleep(0.4)
+      if (self.game.state == 'in_progress'):
+         self.setGameSettings("game")
+      else: # For example, when someone callvotes map_restart.
+         self.setGameSettings()
+
+   #FreezeTag gamemode doesn't call this.
+   def handleGameCountdown(self):
+      self.setGameSettings('game')

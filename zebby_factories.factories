@@ -1,0 +1,15 @@
+[
+   {
+      "id": "vlg",
+      "title": "Vampiric LG",
+      "description": "Do /callvote <map> vlg",
+      "basegt": "ca",
+      "cvars": {
+         "dmflags": "28",
+         "g_startingWeapons": "32",
+         "roundtimelimit": "80",
+         "g_infiniteAmmo": "1",
+         "g_vampiricDamage": "1"
+      }
+   }
+]

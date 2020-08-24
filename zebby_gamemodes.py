@@ -156,13 +156,17 @@ class zebby_gamemodes(minqlx.Plugin):
             if teamsize == '0':
                self.set_cvar(cvar, value)
          elif cvar == 'game_start':
-            if phase == "game":
-               for cvar2, value2 in zebby_factories[key]['game_start'].items():
-                  self.set_cvar(cvar2, value2)
-            else:
-               pass
+            # game_start cvar must always be applied last
+            # to overwrite warmup cvars, so skip for now
+            # and do it in the next loop.
+            pass
          else:
             self.set_cvar(cvar, value)
+
+      for cvar, value in zebby_factories[key].items():
+         if cvar == 'game_start' and phase == 'game':
+            for cvar2, value2 in zebby_factories[key]['game_start'].items():
+               self.set_cvar(cvar2, value2)
 
    @minqlx.thread
    def mapRestart(self):

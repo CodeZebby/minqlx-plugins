@@ -13,6 +13,10 @@ zebby_factories = {
       'roundtimelimit': '90',
       'g_startingWeapons': '8447',
       'dmflags': '28',
+      'g_infiniteAmmo': '1',
+      'game_start': {
+         'g_infiniteAmmo': '0'
+      }
       # 'g_runes': '0',
    },
    'duel': {
@@ -209,7 +213,7 @@ class zebby_gamemodes(minqlx.Plugin):
 
    def setGameSettings(self, phase = "warmup"):
       game_factory = self.get_cvar('g_factory').lower()
-      self.msg('ZEBBY: game factory is {}'.format(str(game_factory)))
+      # self.msg('ZEBBY: game factory is {}'.format(str(game_factory)))
 
       # Load common cvar settings.
       if game_factory in shared_factories:
